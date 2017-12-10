@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 import * as Phaser from 'phaser-ce';
 
@@ -9,50 +9,52 @@ import * as Phaser from 'phaser-ce';
 })
 export class PhaserComponent implements OnInit {
 
-  constructor() { }
+  @Input() public sprite: any = {};
+  @Input() public pos: any = {x:0, y: 0};
+
+  constructor() {
+    this.sprite.x = 0;
+    this.sprite.y = 0;
+  }
+
+  private game: Phaser.Game;
+  private mummy: Phaser.Sprite;
 
   ngOnInit() {
     this.init();
   }
 
-  init(): void {
-    var effect: Phaser.BitmapData;
-    var image: Phaser.Image;
-    var mask: Phaser.Rectangle = new Phaser.Rectangle(0,0,100,100);
+  setPos(x: number, y: number): void {
+    this.game.add.tween(this.mummy).to({ x: x, y: y }, 3000, Phaser.Easing.Sinusoidal.InOut, true, 0, 100, true);
+  }
 
-    var game: Phaser.Game = new Phaser.Game(800, 600, Phaser.AUTO, "phaser-example", {
+  init(): void {
+    this.game = new Phaser.Game(800, 600, Phaser.AUTO, "phaser-example", {
       preload: () => {
-        game.load.image("atari", "assets/demoscene/atari.png");
-        game.load.image("raster", "assets/demoscene/pink-raster.png");
-        game.load.image("floor", "assets/demoscene/checker-floor.png");
+        this.game.load.image("atari", "assets/demoscene/atari.png");
+        this.game.load.image("raster", "assets/demoscene/pink-raster.png");
+        this.game.load.image("floor", "assets/demoscene/checker-floor.png");
+        this.game.load.spritesheet('mummy', 'assets/sprites/metalslug_mummy37x45.png', 37, 45, 18);
+        this.game.load.spritesheet('coco', 'assets/sprites/volt_sprite_sheet_by_kwelfury-d5hx008.png', 180, 248, 18, 0, 0, 4);
       },
 
       create: () => {
-        game.stage.backgroundColor = "#000042";
+        this.game.stage.backgroundColor = "#000042";
 
-        var floor = game.add.image(0, game.height, "floor");
+        var floor = this.game.add.image(0, this.game.height, "floor");
         floor.width = 800;
         floor.anchor.y = 1;
 
-        effect = game.make.bitmapData();
-        effect.load("atari");
-
-        image = game.add.image(game.world.centerX, game.world.centerY, effect);
-        image.anchor.set(0.5);
-        image.smoothed = false;
-
-        mask.setTo(0, 0, effect.width, game.cache.getImage("raster").height);
-
-        //  Tween the rasters
-        game.add.tween(mask).to({ y: -(mask.height - effect.height) }, 3000, Phaser.Easing.Sinusoidal.InOut, true, 0, 100, true);
-
-        //  Tween the image
-        game.add.tween(image.scale).to({ x: 4, y: 4 }, 3000, Phaser.Easing.Quartic.InOut, true, 0, 100, true);
+        this.mummy = this.game.add.sprite(100, 400, 'mummy');
+        this.mummy.animations.add('walk');
+        this.mummy.animations.play('walk', 20, true);
+        return;
+        //this.game.add.tween(this.mummy).to({ x: 700, y: 400 }, 3000, Phaser.Easing.Sinusoidal.InOut, true, 0, 100, true);
       },
 
       update: () => {
-        effect.alphaMask("raster", effect, mask);
-        image.rotation += 0.01;
+        this.sprite.x = this.mummy.x;
+        this.sprite.y = this.mummy.y;
       }
     });
   }

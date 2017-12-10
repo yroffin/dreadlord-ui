@@ -1,3 +1,10 @@
 <p>
   phaser works!
 </p>
+<h1>Data binding 2-way</h1>
+<input matInput placeholder="X" [(ngModel)]="sprite.x">
+<input matInput placeholder="Y" [(ngModel)]="sprite.y">
+<input matInput placeholder="X" [(ngModel)]="pos.x">
+<input matInput placeholder="Y" [(ngModel)]="pos.y">
+<button matButton (click)="setPos(pos.x,pos.y)">set</button>
+
